@@ -1,23 +1,27 @@
 import { setupMiddleware } from './middlewares/setup-middleware';
 import { setupRoutes } from './routes/setup-routes';
-import { initDatabase } from './database/init';
+import SEQUELIZE from './database/sequelize';
 import express, { Application } from 'express';
-import dotenv from 'dotenv';
+import { PG_DB_PORT, SERVER_PORT } from './config/env-module';
 
-dotenv.config();
+console.log("NODE_ENV at runtime: ", process.env.NODE_ENV);
+
 
 export const SERVER: Application = express();
-export const port = process.env.SERVER_PORT || 5555;
+
 
 const start = async () => {
   try {
     setupMiddleware();
     setupRoutes();
-    await initDatabase();
 
-    SERVER.listen(port, () => {
+    // Authenticate the Sequelize instance to ensure the DB connection is successful
+    await SEQUELIZE.authenticate();
+
+
+    SERVER.listen(SERVER_PORT, () => {
       console.log("");
-      console.log(`✅ RESULT: Server is running on port ${port}`);
+      console.log(`✅ RESULT: Server is running on port ${SERVER_PORT}`);
       console.log("");
     });
   } catch (error) {

@@ -6,7 +6,7 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import csrf from 'csurf';
 import { SERVER } from '../server';
-import { Request, CSRFError } from '../types';
+import { Request, CSRFError } from '../types/ts-definitions';
 
 export const setupMiddleware = () => {
   SERVER.use(morgan('development'));
@@ -15,7 +15,7 @@ export const setupMiddleware = () => {
 
 
   SERVER.use(cors({
-    origin: ['http://localhost:5555', 'http://127.0.0.1:5555', 'file://', 'http://localhost:3000'],
+    origin: ['http://localhost:5555', 'http://127.0.0.1:5555', 'file://', 'http://localhost:5432'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization', 'XSRF-Token'],
     credentials: true

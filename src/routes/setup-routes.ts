@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import { QueryTypes } from 'sequelize';
-import { Request, TimeResult } from '../types';
+import { Request, TimeResult } from '../types/ts-definitions';
 import { User } from '../database/models/User';
-import SEQUELIZE from '../config/env-module';
+import SEQUELIZE from '../database/sequelize';
 import { SERVER } from '../server';
 
 export const setupRoutes = () => {

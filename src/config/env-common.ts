@@ -1,42 +1,60 @@
 const { config } = require('dotenv');
+const path = require('path');
 
-console.log(config({ path: '.env/.env.example'}));
-console.log('Database Password:', process.env.PG_DB_PASSWORD);
+console.log("NODE_ENV: ----------------------> ", process.env.NODE_ENV); // Debugging NODE_ENV
 
-type DatabaseConfig = {
-  username: string;
-  password: string;
-  database: string;
-  host: string;
-  port: number;
-  dialect: 'postgres';
-};
+// Dynamically set the path depending on the environment
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
 
-const development: DatabaseConfig = {
-  username: String(process.env.PG_DB_USER || 'postgres'),
-  password: String(process.env.PG_DB_PASSWORD || ''), // Ensure it's a string
-  database: String(process.env.PG_DB_NAME || 'db_postgres'),
-  host: String(process.env.PG_DB_HOST || 'localhost'),
-  port: parseInt(String(process.env.PG_DB_PORT || '5432'), 10),
-  dialect: 'postgres',
-};
+// Log which environment file is loaded (for debugging)
+console.log(`Loading environment variables from: ${envFile}`);
 
-const test: DatabaseConfig = {
-  username: String(process.env.PG_DB_USER || 'postgres'),
-  password: String(process.env.PG_DB_PASSWORD || ''),
-  database: String(process.env.PG_DB_NAME_TEST || 'db_postgres_test'),
-  host: String(process.env.PG_DB_HOST || 'localhost'),
-  port: parseInt(String(process.env.PG_DB_PORT || '5432'), 10),
-  dialect: 'postgres',
-};
+// Load environment variables from the determined file
+const result = config({ path: path.resolve(process.cwd(), envFile)});
 
-const production: DatabaseConfig = {
-  username: String(process.env.PG_DB_USER || 'postgres'),
-  password: String(process.env.PG_DB_PASSWORD || ''),
-  database: String(process.env.PG_DB_NAME || 'db_postgres'),
-  host: String(process.env.PG_DB_HOST || 'localhost'),
-  port: parseInt(String(process.env.PG_DB_PORT || '5432'), 10),
-  dialect: 'postgres',
-};
+console.log("result: -----------> ", result)
 
-export = { development, test, production };
+// Handle error if the .env file is not loaded correctly
+if (result.error) {
+  console.error(`Error loading environment variables from ${envFile}`);
+  process.exit(1);  // Exit the process if env variables cannot be loaded
+}
+
+console.log("NODE_ENV: ----------------------> ", process.env.NODE_ENV);
+
+// Define common environment variables required by the application
+const requiredEnvVars = [
+  'PG_DB_HOST',
+  'PG_DB_USERNAME',
+  'PG_DB_PASSWORD',
+  'PG_DB_NAME',
+  'PG_DB_PORT',
+  'SERVER_PORT',
+  'NODE_ENV',
+  'BASE_URL',
+  'JWT_ACCESS_TOKEN_SECRET',
+  'JWT_REFRESH_TOKEN_SECRET',
+];
+
+// Ensure that all required environment variables are set
+requiredEnvVars.forEach((envVar) => {
+  if (!process.env[envVar]) {
+    throw new Error(`Missing required environment variable: ${envVar}`);
+  }
+});
+
+
+// Destructure environment variables from process.env and export
+export const {
+  SERVER_PORT,
+  NODE_ENV,
+  BASE_URL,
+  JWT_ACCESS_TOKEN_SECRET,
+  JWT_REFRESH_TOKEN_SECRET,
+  PG_DB_HOST,
+  PG_DB_USERNAME,
+  PG_DB_PASSWORD,
+  PG_DB_NAME,
+  PG_DB_PORT,
+  PG_DB_DIALECT,
+} = process.env;
